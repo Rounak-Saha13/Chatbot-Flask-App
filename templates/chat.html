@@ -1,0 +1,96 @@
+<!-- templates/chat.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>College Inquiry Chatbot</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center mt-4">
+            <div class="col-md-10">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white">
+                        <h2 class="text-center mb-0">College Inquiry Chatbot</h2>
+                        <p class="text-center mb-0">Welcome, {{ user_info.first_name }}!</p>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="card mb-3">
+                                    <div class="card-header bg-secondary text-white">
+                                        <h5 class="mb-0">Common Questions</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <form action="{{ url_for('process') }}" method="post">
+                                            {% for question in faq_questions %}
+                                                {% set question_asked = false %}
+                                                {% for entry in chat_history %}
+                                                    {% if entry.question == question %}
+                                                        {% set question_asked = true %}
+                                                    {% endif %}
+                                                {% endfor %}
+
+                                                <div class="d-grid mb-2">
+                                                    <button type="submit" name="question" value="{{ question }}"
+                                                            class="btn btn-outline-primary text-start {% if question_asked %}disabled{% endif %}">
+                                                        {{ question }}
+                                                    </button>
+                                                </div>
+                                            {% endfor %}
+                                        </form>
+
+                                        {% if all_answered %}
+                                        <div class="d-grid mt-4">
+                                            <a href="{{ url_for('conclusion') }}" class="btn btn-success">View Conclusion</a>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="chat-container p-3 border rounded" style="height: 400px; overflow-y: auto;">
+                                    <div class="chat-welcome mb-4">
+                                        <div class="chat-message bot-message">
+                                            <div class="message-content">
+                                                <p>Hello {{ user_info.first_name }}! I'm your college inquiry assistant. Please select one of the common questions from the left panel, or type your own question below.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {% for entry in chat_history %}
+                                        <div class="chat-exchange mb-3">
+                                            <div class="chat-message user-message text-end mb-2">
+                                                <div class="message-content bg-light p-2 rounded d-inline-block">
+                                                    <p class="mb-0">{{ entry.question }}</p>
+                                                </div>
+                                            </div>
+                                            <div class="chat-message bot-message">
+                                                <div class="message-content bg-primary text-white p-2 rounded d-inline-block">
+                                                    <p class="mb-0">{{ entry.answer }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Auto-scroll to bottom of chat container
+        document.addEventListener('DOMContentLoaded', function() {
+            var chatContainer = document.querySelector('.chat-container');
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        });
+    </script>
+</body>
+</html>
